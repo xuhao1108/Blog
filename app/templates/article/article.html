@@ -1,0 +1,85 @@
+{% extends 'common/base.html' %}
+{% from 'common/macro.html' import show_img,page_info %}
+
+{% block title %}{{ article.title }}{% endblock %}
+
+{% block page_content %}
+    <div class="page-header">
+        <div class="media-body">
+            <h1>{{ article.title }}
+                <small>
+                    <a href="{{ url_for('user.info',username=article.user.username) }}" target="_blank">
+                        {{ article.user.nickname if article.user.nickname }}({{ article.user.username }})
+                    </a>
+                </small>
+            </h1>
+        </div>
+        <div class="media-right">
+            {{ show_img(article.user) }}
+        </div>
+    </div>
+    <p style="text-indent: 2em;">
+        {{ article.body }}
+    </p>
+    <span>发布于：
+        {{ moment(article.time).format('LLL') }}
+    </span>
+    <span>最后修改：
+        {{ moment(article.last_modify).format('LLL') }}
+    </span>
+    {% if current_user == article.user %}
+        <br/>
+        <a href="{{ url_for('article.update',id=article.id) }}">修改</a>
+    {% endif %}
+    {% if current_user == article.user or current_user.role == admin %}
+        {% if current_user == article.user %}
+            <a href="{{ url_for('article.delete',id=article.id) }}">删除</a>
+        {% else %}
+            <a href="{{ url_for('article.delete',id=article.id,next=url_for('main.index')) }}">删除</a>
+        {% endif %}
+    {% endif %}
+    <hr/>
+    <h3 id="comment">评论：</h3>
+    {% if pagination.pages %}
+        {% for comment in comments %}
+            <div class="media">
+                <div class="media-left media-middle">
+                    {{ show_img(comment.user, _class="media-object") }}
+                </div>
+                <div class="media-body" style="position: relative;">
+                    <h4 class="media-heading">
+                        <a href="{{ url_for('user.info',username=comment.user.username) }}" target="_blank">
+                            {{ comment.user.nickname if comment.user.nickname }}({{ comment.user.username }})
+                        </a>
+                    </h4>
+                    {% if not comment.is_show %}
+                        <h5>'此内容已被管理员隐藏'</h5>
+                    {% endif %}
+                    {% if comment.is_show or current_user.role == admin %}
+                        <p>{{ comment.body }}</p>
+                    {% endif %}
+                    {% if current_user == comment.user or current_user.role == admin %}
+                        <br/>
+                        <div style="position: absolute; bottom: 0; left: 0;">
+                            <a href="{{ url_for('comment.delete',id=comment.id,next=request.url) }}">删除</a>
+                            {% if current_user.role == admin %}
+                                <a href="{{ url_for('comment.set_show',id=comment.id,next=request.url) }}">
+                                    {{ '隐藏' if comment.is_show else '显示' }}
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                    <span style="position: absolute; bottom: 0; right: 0;">
+                        <strong>{{ moment(comment.time).fromNow() }}</strong>
+                    </span>
+                </div>
+            </div>
+        {% endfor %}
+        {{ page_info(pagination,'article.get','#comment',id=article.id) }}
+    {% else %}
+        <div style="text-align: center;">
+            <h2>空空如也</h2>
+        </div>
+    {% endif %}
+    {{ wtf.quick_form(form) }}
+{% endblock %}

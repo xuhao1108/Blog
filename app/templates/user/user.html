@@ -1,0 +1,31 @@
+{% extends 'common/base.html' %}
+{% from 'common/macro.html' import show_img %}
+
+{% block title %}{{ user.nickname if user.nickname else user.username }}的信息{% endblock %}
+
+{% block page_content %}
+    <div class="media">
+        <div class="media-left">
+            <a href="{{ url_for('static',filename='image/'+user.protrait) }}" target="_blank">
+                {{ show_img(user,_class="media-object") }}
+            </a>
+        </div>
+        <div class="media-body">
+            <h4 class="media-heading">{{ user.nickname if user.nickname }}({{ user.username }})</h4>
+            {{ user.info if user.info }}
+        </div>
+    </div>
+    <ul class="list-group">
+        <li class="list-group-item">账号：{{ user.username }}</li>
+        <li class="list-group-item">邮箱：{{ user.email }}</li>
+        <li class="list-group-item">昵称：{{ user.nickname if user.nickname else '未设置' }}</li>
+        <li class="list-group-item">性别：{{ user.sex if user.sex else '未设置' }}</li>
+        <li class="list-group-item">简介：{{ user.info if user.info else '未设置' }}</li>
+    </ul>
+    <a href="{{ url_for('article.all',username=user.username) }}" target="_blank">
+        {{ '我的文章' if current_user.username == user.username else '他的文章' }}
+    </a>
+    <a href="{{ url_for('comment.all',username=user.username) }}" target="_blank">
+        {{ '我的评论' if current_user.username == user.username else '他的评论' }}
+    </a>
+{% endblock %}

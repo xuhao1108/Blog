@@ -1,0 +1,7 @@
+{% extends 'common/base.html' %}
+
+{% block title %}{{ form.title.data if form.title.data else '写文章' }}{% endblock %}
+
+{% block page_content %}
+{{ wtf.quick_form(form) }}
+{% endblock %}

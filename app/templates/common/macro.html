@@ -1,0 +1,41 @@
+{% macro show_img(user,_class='',_id='') %}
+    <a href="{{ url_for('static',filename='image/'+user.protrait) }}" target="_blank">
+        <img src="{{ url_for('static',filename='image/'+user.protrait) }}" alt='{{ user.username }}'
+             class='{{ _class }}'
+             id='{{ _id }}' style="width: 100px;height: 100px;"/>
+    </a>
+{% endmacro %}
+
+{% macro page_info(pagination,endpoint,location='') %}
+    {% if pagination.pages %}
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                <li {% if not pagination.has_prev %} class="disabled" {% endif %}>
+                    <a href="
+                            {% if pagination.has_prev %}{{ url_for(endpoint,page=pagination.prev_num,**kwargs) }}{{ location }}
+                    {% else %}#{% endif %}"
+                       aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {% for page in pagination.iter_pages() %}
+                    {% if page %}
+                        <li {% if page== pagination.page %} class="active" {% endif %}>
+                            <a href="{{ url_for(endpoint,page=page,**kwargs) }}{{ location }}">{{ page }}</a>
+                        </li>
+                    {% else %}
+                        <li><a href="#">...</a></li>
+                    {% endif %}
+                {% endfor %}
+                <li {% if not pagination.has_next %} class="disabled" {% endif %}>
+                    <a href="
+                            {% if pagination.has_next %}{{ url_for(endpoint,page=pagination.next_num,**kwargs) }}{{ location }}
+                    {% else %}#{% endif %}"
+                       aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    {% endif %}
+{% endmacro %}

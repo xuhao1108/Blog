@@ -1,0 +1,62 @@
+{% extends 'common/base.html' %}
+{% from 'common/macro.html' import show_img,page_info %}
+
+{% block title %}{{ user.nickname if user.nickname else user.username }}的文章{% endblock %}
+
+{% block page_content %}
+    <div class="media">
+        <div class="media-left">
+            {{ show_img(user) }}
+        </div>
+        <div class="media-body">
+            <h4 class="media-heading">
+                <a href="{{ url_for('user.info',username=user.username) }}" target="_blank">
+                    {{ user.nickname if user.nickname }}({{ user.username }})
+                </a>
+            </h4>
+            {{ user.info if user.info }}
+        </div>
+    </div>
+
+
+    <h3 id="article">文章：</h3>
+    {% if pagination.pages %}
+        {% for article in articles %}
+            <div class="list-group">
+                <a href="{{ url_for('article.get',id=article.id) }}" class="list-group-item active">
+                    <h4 class="list-group-item-heading"
+                        style="text-overflow : ellipsis; white-space: nowrap; overflow: hidden;">
+                        {{ article.title }}
+                    </h4>
+                    <p class="list-group-item-text"
+                       style="text-overflow : ellipsis; white-space: nowrap; overflow: hidden;">
+                        {{ article.body }}
+                    </p>
+                    <span>
+                    最后修改：{{ moment(article.last_modify).format('LLL') }}
+                </span>
+                    <span>
+                    发布于：{{ moment(article.time).format('LLL') }}
+                </span>
+                </a>
+                {% if current_user == article.user %}
+                    <a href="{{ url_for('article.update',id=article.id) }}">修改</a>
+                {% endif %}
+                {% if current_user == article.user or current_user.role == admin %}
+                    <a href="{{ url_for('article.delete',id=article.id,next=request.url) }}">删除</a>
+                {% endif %}
+            </div>
+        {% endfor %}
+        {{ page_info(pagination,'article.all',username=user.username) }}
+    {% else %}
+        <div style="text-align: center;">
+            <h2>
+                {% if curren_user == user %}
+                    <a href="{{ url_for('article.write') }}">快去写文章吧！</a>
+                {% else %}
+                    空
+                {% endif %}
+            </h2>
+        </div>
+    {% endif %}
+{% endblock %}

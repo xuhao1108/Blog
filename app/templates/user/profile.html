@@ -1,0 +1,10 @@
+{% extends 'common/base.html' %}
+
+{% block title %}我的信息{% endblock %}
+
+{% block page_content %}
+<label>头像</label>
+<img src="{{ url_for('static',filename='image/'+current_user.protrait) }}" alt="{{ current_user.username }}"
+     style="width: 100px;height: 100px;"/>
+{{ wtf.quick_form(form) }}
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends 'common/base.html' %}
+{% from 'common/macro.html' import page_info %}
+
+{% block page_content %}
+    <h1>当前时间{{ moment(current_time).format('LLL') }}</h1>
+    {% for article in articles %}
+        <div class="list-group">
+            <a href="{{ url_for('article.get',id=article.id) }}" class="list-group-item active" target="_blank">
+                <h4 class="list-group-item-heading"
+                    style="text-overflow : ellipsis; white-space: nowrap; overflow: hidden;">
+                    {{ article.title }}
+                </h4>
+                <p class="list-group-item-text"
+                   style="text-overflow : ellipsis; white-space: nowrap; overflow: hidden;">
+                    {{ article.body }}
+                </p>
+                <span>最后修改：
+                    {{ moment(article.last_modify).fromNow() }}
+                </span>
+                <span>发布于：
+                    {{ moment(article.time).fromNow() }}
+                </span>
+            </a>
+            {% if current_user == article.user %}
+                <br/>
+                <a href="{{ url_for('article.update',id=article.id) }}">修改</a>
+            {% endif %}
+            {% if current_user == article.user or current_user.role == admin %}
+                <a href="{{ url_for('article.delete',id=article.id,next=request.url) }}">删除</a>
+            {% endif %}
+        </div>
+    {% endfor %}
+    {{ page_info(pagination,'.index') }}
+{% endblock %}
